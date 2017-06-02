@@ -95,6 +95,7 @@ public class FullHttpRequestWrapper implements HttpServletRequest {
 		}
 		
 		this.setContentType(request.headers().get("Content-Type"));
+		this.servletPath = requestURI;
 	}
 	
 	public FullHttpRequest getHttpRequest(){
