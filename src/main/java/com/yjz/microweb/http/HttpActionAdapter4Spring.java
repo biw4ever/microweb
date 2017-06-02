@@ -89,9 +89,13 @@ public class HttpActionAdapter4Spring implements HttpActionAdapter
         FullHttpResponseWrapper responseWrapper = new FullHttpResponseWrapper(ctx, resp);
         ((FullHttpRequestWrapper) requestWrapper).setResponse(responseWrapper);
         
-        if (request.headers().get("Content-Type").toUpperCase().contains("MULTIPART/FORM-DATA"))
+        if(request.headers() != null)
         {
-            requestWrapper = new CommonsMultipartResolver().resolveMultipart(requestWrapper);
+        	String contentTye = request.headers().get("Content-Type");
+        	if(contentTye !=  null && contentTye.toUpperCase().contains("MULTIPART/FORM-DATA"))
+        	{
+        		requestWrapper = new CommonsMultipartResolver().resolveMultipart(requestWrapper);
+        	}
         }
         
         try
