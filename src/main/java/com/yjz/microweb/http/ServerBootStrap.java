@@ -18,9 +18,9 @@ public class ServerBootStrap
         try
         {  
             // 
-            logger.error("Start Initializing Webapp Context.");
+            logger.info("Start Initializing Webapp Context.");
             HttpCoreServer.instance().init();
-            logger.error("Webapp Context has been initialized.");
+            logger.info("Webapp Context has been initialized.");
             
             Properties properties = new Properties();
             properties.load(ServerBootStrap.class.getClassLoader().getResourceAsStream("microweb.properties"));

@@ -82,9 +82,9 @@ public class HttpServer
                 .childOption(ChannelOption.SO_KEEPALIVE, true) // 是否保持连接
                 .childHandler(new HttpPipelineInitializer(executorService, sslCtx, TIMEOUT)); // 传入附带异步线程池的channelHandler
             
-            logger.error("Start binding http server port on + " + conf.port);
+            logger.info("Start binding http server port on " + conf.port);
             Channel channel = b.bind(conf.port).sync().channel(); // 绑定端口直到绑定完成
-            logger.error("Http server port is bound.");
+            logger.info("Http server port is bound.");
             
             channel.closeFuture().sync(); // 阻塞关闭操作
         }
