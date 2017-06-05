@@ -126,7 +126,7 @@ public class MicrowebServletContext implements ServletContext
     
     // ------------------------------------------------------------ Constructors
     
-    protected MicrowebServletContext()
+    public MicrowebServletContext()
     {
         displayName = "";
         contextPath = "";

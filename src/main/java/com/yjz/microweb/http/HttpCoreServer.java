@@ -80,7 +80,7 @@ public class HttpCoreServer
     private void initServletContext()
     {
         // TODO 读取配置的servletcontext名称
-        this.servletContext = new MicrowebServletContext("slimHS");
+        this.servletContext = new MicrowebServletContext();
     }
     
     private void initWebApplication()

@@ -17,22 +17,29 @@ public class ServerBootStrap
     {
         try
         {  
-            // 
+            /**************************************************************************************/
+            Properties properties = new Properties();
+            properties.load(ServerBootStrap.class.getClassLoader().getResourceAsStream("microweb.properties"));
+            
+            String serverPortStr = properties.get("server.port").toString();
+            int serverPort = serverPortStr == null ? 8080 : Integer.parseInt(serverPortStr);
+            /**************************************************************************************/
+            
+            /**************************************************************************************/
             logger.info("Start Initializing Webapp Context.");
             HttpCoreServer.instance().init();
             logger.info("Webapp Context has been initialized.");
+            /**************************************************************************************/
             
-            Properties properties = new Properties();
-            properties.load(ServerBootStrap.class.getClassLoader().getResourceAsStream("microweb.properties"));
-            String serverPortStr = properties.get("server.port").toString();
-            int serverPort = serverPortStr == null ? 8080 : Integer.parseInt(serverPortStr);
-            
+            /**************************************************************************************/
             HttpServerConf conf = new HttpServerConf();
             conf.setPort(serverPort);
+            
+            logger.info("Start Initializing httpServer.");
             HttpServer httpServer = new HttpServer(conf);
-            
             httpServer.doStart();
-            
+            logger.info("HttpServer has been initialized.");
+            /**************************************************************************************/
         }
         catch (CertificateException | IOException e)
         {
