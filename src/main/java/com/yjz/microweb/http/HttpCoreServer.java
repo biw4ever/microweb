@@ -1,6 +1,8 @@
 package com.yjz.microweb.http;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +35,7 @@ import io.netty.handler.codec.http.HttpResponse;
 
 /**
  * HttpServlet核心服务器
+ * 
  * @ClassName HttpCoreServer
  * @Description TODO(这里用一句话描述这个类的作用)
  * @author biw
@@ -97,7 +100,6 @@ public class HttpCoreServer
         try
         {
             
-            
             this.dispatcherServlet = new DispatcherServlet(this.wac);
             this.dispatcherServlet.init(this.wac.getServletConfig());
         }
@@ -154,22 +156,22 @@ public class HttpCoreServer
                     MicrowebFilterConfig conifg = new MicrowebFilterConfig(servletContext);
                     conifg.setFilter(filter);
                     conifg.setFilterName(filterNameAnno.value());
-                    conifg.setInitParameters(initParams);   
+                    conifg.setInitParameters(initParams);
                     filter.init(conifg);
                     servletContext.addFilter(conifg.getFilterName(), filter);
                     
-                    for(String urlPattern : filterUrlPatternAnno.value())
+                    for (String urlPattern : filterUrlPatternAnno.value())
                     {
                         FilterMap filterMap = new FilterMap();
                         filterMap.setFilterName(filterNameAnno.value());
                         filterMap.setURLPattern(urlPattern);
                         servletContext.addFilterMap(filterMap, false);
-                    }   
+                    }
                 }
                 catch (InstantiationException | IllegalAccessException | ServletException e)
                 {
                     throw new MicrowebException(e);
-                }    
+                }
             }
         }
     }
@@ -194,7 +196,16 @@ public class HttpCoreServer
         String uri = request.uri();
         String[] temp = uri.split("\\?");
         String shortUri = getRequestURI(temp[0]);
-        Map<String, String[]> parameters = getParameters(temp);
+        
+        Map<String, String[]> parameters = null;
+        if (method.equals(HttpMethod.GET))
+        {
+            parameters = temp.length > 1 ? getParameters(temp[1]) : new HashMap<>();
+        }
+        else if (method.equals(HttpMethod.POST))
+        {
+            parameters = getParametersInBoby(request);
+        }
         
         if (method.equals(HttpMethod.GET))
         {
@@ -249,21 +260,56 @@ public class HttpCoreServer
      * @param temp
      * @return
      */
-    private Map<String, String[]> getParameters(String[] temp)
+    private Map<String, String[]> getParameters(String paramNameValueStr)
     {
         Map<String, String[]> map = new HashMap<String, String[]>();
-        if (temp.length > 1)
+        
+        String suffix = paramNameValueStr;
+        String[] params = suffix.split("&");
+        for (String s : params)
         {
-            String suffix = temp[1];
-            String[] params = suffix.split("&");
-            for (String s : params)
+            String[] keyValues = s.split("=");
+            if(keyValues.length > 1)
             {
-                String[] keyValues = s.split("=");
-                String key = keyValues[0];
+                String key = keyValues[0]; 
                 String[] values = keyValues[1].split(",");
                 map.put(key, values);
             }
+            
         }
+        
         return map;
+    }
+    
+    private Map<String, String[]> getParametersInBoby(FullHttpRequest request)
+    {
+        if (request.content() == null)
+        {
+            return new HashMap<String, String[]>();
+        }
+        
+        byte[] dst = null;
+        if (request.content().isDirect())
+        {
+            dst = new byte[request.content().capacity()];
+            request.content().getBytes(0, dst);
+        }
+        else
+        {
+            dst = request.content().array();
+        }
+        
+        String bodyContent;
+        try
+        {
+            bodyContent = new String(dst, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            logger.error("request content-type charset should be UTF-8");
+            throw new MicrowebException(e);
+        }
+        return getParameters(bodyContent);
+        
     }
 }
