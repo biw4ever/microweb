@@ -31,13 +31,13 @@ public class ServerBootStrap
             String sslEnabledStr = properties.getProperty("ssl.enabled");
             boolean sslEnabled = sslEnabledStr == null ? false : Boolean.valueOf(sslEnabledStr);
             
-            String corePoolSizeStr = properties.getProperty("corepool.size");
+            String corePoolSizeStr = properties.getProperty("core.poolsize");
             int corePoolSize = corePoolSizeStr == null ? 100 : Integer.parseInt(corePoolSizeStr);
             
-            String maximumPoolSizeStr = properties.getProperty("maximumPoolSize");
+            String maximumPoolSizeStr = properties.getProperty("maximum.poolsize");
             int maximumPoolSize = maximumPoolSizeStr == null ? 1000 : Integer.parseInt(maximumPoolSizeStr);
             
-            String poolQueueSizeStr = properties.getProperty("poolQueueSizeStr");
+            String poolQueueSizeStr = properties.getProperty("pool.queuesize");
             int poolQueueSize = poolQueueSizeStr == null ? 100 : Integer.parseInt(poolQueueSizeStr);
             
             logger.info("Finished loading microweb.properties.");
