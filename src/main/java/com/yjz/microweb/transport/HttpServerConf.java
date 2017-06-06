@@ -11,6 +11,8 @@ public class HttpServerConf
     
     protected int maximumPoolSize = 1000;
     
+    protected int poolQueueSize = 100;
+    
     public boolean isSslEnabled()
     {
         return sslEnabled;
@@ -61,6 +63,6 @@ public class HttpServerConf
         this.poolQueueSize = poolQueueSize;
     }
 
-    protected int poolQueueSize = 100;
+    
   
 }

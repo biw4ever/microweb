@@ -65,9 +65,9 @@ public class HttpCoreServer
         return httpCoreServer;
     }
     
-    public void init()
+    public void init(String servletContextName)
     {
-        initServletContext();
+        initServletContext(servletContextName);
         
         initWebApplication();
         
@@ -77,10 +77,9 @@ public class HttpCoreServer
         
     }
     
-    private void initServletContext()
+    private void initServletContext(String servletContextName)
     {
-        // TODO 读取配置的servletcontext名称
-        this.servletContext = new MicrowebServletContext();
+        this.servletContext = new MicrowebServletContext(servletContextName, servletContextName, servletContextName);
     }
     
     private void initWebApplication()
@@ -194,7 +193,7 @@ public class HttpCoreServer
         
         String uri = request.uri();
         String[] temp = uri.split("\\?");
-        String shortUri = temp[0];
+        String shortUri = getRequestURI(temp[0]);
         Map<String, String[]> parameters = getParameters(temp);
         
         if (method.equals(HttpMethod.GET))
@@ -237,6 +236,11 @@ public class HttpCoreServer
         {
             return action.doUnContainMethod(ctx, request, shortUri, parameters);
         }
+    }
+    
+    private String getRequestURI(String fullPath)
+    {
+        return fullPath.replaceAll(servletContext.getContextPath(), "");
     }
     
     /**
