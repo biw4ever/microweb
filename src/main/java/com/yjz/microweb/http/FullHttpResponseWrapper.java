@@ -49,9 +49,55 @@ public class FullHttpResponseWrapper implements HttpServletResponse {
 		ByteBuf buf = response.content();
 		response = (DefaultFullHttpResponse) response.replace(buf.writeBytes(content.toByteArray()));
 		this.contentLength = response.content().readableBytes();
-		
+		String con = new String(content.toByteArray());
 		HttpHeaders headers = response.headers();
-		headers.add("Content-Length", this.contentLength);
+		for(String hname : getHeaderNames())
+		{
+		    headers.add(hname, getHeaderValue(hname));
+		}
+		for(Cookie cookie : getCookies())
+		{
+		    StringBuilder sb = new StringBuilder();
+		    
+		    sb.append(cookie.getName())
+            .append("=")
+            .append(cookie.getValue())
+            .append(";");
+		    
+		    if(cookie.getSecure())
+		    {
+		        sb.append("Secure=")
+		        .append(cookie.getSecure())
+		        .append(";");
+		    }
+		    if(cookie.getComment() != null)
+		    {
+		        sb.append("Comment=")
+                .append(cookie.getComment())
+                .append(";");
+		    }
+		    if(cookie.getDomain() != null)
+            {
+                sb.append("Domain=")
+                .append(cookie.getDomain())
+                .append(";");
+            }
+		    if(cookie.getPath() != null)
+            {
+                sb.append("Path=")
+                .append(cookie.getPath())
+                .append(";");
+            }
+		    if(cookie.getVersion() != 0)
+            {
+                sb.append("Path=")
+                .append(cookie.getVersion())
+                .append(";");
+            }
+
+		    headers.add("Set-Cookie", sb.substring(0, sb.length() - 1));
+		}
+
 		return response;
 	}
 

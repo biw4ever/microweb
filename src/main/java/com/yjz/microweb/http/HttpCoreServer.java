@@ -2,12 +2,11 @@ package com.yjz.microweb.http;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
-import java.net.URLEncoder;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.Filter;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
 import org.slf4j.Logger;
@@ -302,7 +301,7 @@ public class HttpCoreServer
         String bodyContent;
         try
         {
-            bodyContent = new String(dst, "UTF-8");
+            bodyContent = URLDecoder.decode(new String(dst, "UTF-8"));
         }
         catch (UnsupportedEncodingException e)
         {

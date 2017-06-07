@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -96,6 +97,26 @@ public class FullHttpRequestWrapper implements HttpServletRequest {
 		
 		this.setContentType(request.headers().get("Content-Type"));
 		this.servletPath = requestURI;
+		
+		String cookieStr = request.headers().get("Cookie");
+		if(cookieStr != null)
+		{
+		    String[] cookies = cookieStr.split(";");
+		    if(cookies.length > 0)
+		    {
+		        List<Cookie> cookieList = new ArrayList<>();
+		        for(String cookie : cookies)
+		        {
+		            String[] nameValue = cookie.split("=");
+		            if(nameValue.length > 1)
+		            {
+		                cookieList.add(new Cookie(nameValue[0].trim(), nameValue[1].trim()));
+		            }
+		        }
+		        
+		        this.setCookies(cookieList.toArray(new Cookie[0]));
+		    }
+		}
 	}
 	
 	public FullHttpRequest getHttpRequest(){
