@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Enumeration;
 
 /**
  * 网络工具类
@@ -42,19 +43,30 @@ public class InetUtil {
 	 */
 	public static String getLocalMacAddress(){
 		try {
-			InetAddress inetAddress = InetAddress.getLocalHost();
-			byte[] mac = NetworkInterface.getByInetAddress(inetAddress).getHardwareAddress();
+		    Enumeration<NetworkInterface> enumer =  NetworkInterface.getNetworkInterfaces();
+		    byte[] mac = null;
+		    while(enumer.hasMoreElements())
+		    {
+		        NetworkInterface ni = enumer.nextElement();
+		        mac = ni.getHardwareAddress();
+		        if(mac != null)
+		        {
+		            break;
+		        }
+		    }
+
 			StringBuilder sb = new StringBuilder();
 			if(mac == null)
 			{
 			    return sb.toString();
 			}
+			
 			for (int i = 0; i < mac.length; i++) {
 				String s = Integer.toHexString(mac[i] & 0xFF);
 				sb.append(s.length() == 1 ? 0 + s : s);
 			}
 			return sb.toString().trim().toUpperCase();
-		} catch (UnknownHostException | SocketException e) {
+		} catch (SocketException e) {
 			return "";
 		}
 	}
