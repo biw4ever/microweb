@@ -45,14 +45,17 @@ public class InetUtil {
 			InetAddress inetAddress = InetAddress.getLocalHost();
 			byte[] mac = NetworkInterface.getByInetAddress(inetAddress).getHardwareAddress();
 			StringBuilder sb = new StringBuilder();
+			if(mac == null)
+			{
+			    return sb.toString();
+			}
 			for (int i = 0; i < mac.length; i++) {
 				String s = Integer.toHexString(mac[i] & 0xFF);
 				sb.append(s.length() == 1 ? 0 + s : s);
 			}
 			return sb.toString().trim().toUpperCase();
 		} catch (UnknownHostException | SocketException e) {
-			e.printStackTrace();
-			return null;
+			return "";
 		}
 	}
 
