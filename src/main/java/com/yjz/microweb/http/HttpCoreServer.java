@@ -164,7 +164,7 @@ public class HttpCoreServer
                         FilterMap filterMap = new FilterMap();
                         filterMap.setFilterName(filterNameAnno.value());
                         filterMap.setURLPattern(urlPattern);
-                        servletContext.addFilterMap(filterMap, false);
+                        servletContext.addFilterMap(filterMap, true);
                     }
                 }
                 catch (InstantiationException | IllegalAccessException | ServletException e)
