@@ -18,6 +18,7 @@ import com.yjz.microweb.context.MicrowebServletContext;
 import com.yjz.microweb.filter.FilterChainFactory;
 import com.yjz.microweb.filter.MicrowebFilterChain;
 import com.yjz.microweb.util.FileUtil;
+import com.yjz.microweb.util.MimeType;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -69,24 +70,9 @@ public class HttpActionAdapter4Spring implements HttpActionAdapter
         Map<String, String[]> parameters)
     {
         FullHttpResponse resp = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
-        
-        // 请求静态资源(可选择是否进入SpringMVC处理)
-        // if (isStaticSupport && !requestURI.endsWith(".do") && !requestURI.endsWith(".mo")
-        // && !requestURI.endsWith(".ws"))
-        // {
-        // return getStaticResource(request, resp, requestURI, parameters);
-        // }
-        
-        // 请求动态资源
-//        if (request.headers().get("Content-Type").toUpperCase().contains("MULTIPART/FORM-DATA"))
-//        {
-//            HttpDataFactory factory = new DefaultHttpDataFactory(DefaultHttpDataFactory.MINSIZE);
-//            requestWrapper =
-//                new MultipartFullHttpRequestWrapper(servletContext, factory, request, requestURI, parameters);
-//        }
 
         HttpServletRequest requestWrapper = new FullHttpRequestWrapper(servletContext, request, requestURI, parameters);
-        FullHttpResponseWrapper responseWrapper = new FullHttpResponseWrapper(ctx, resp);
+        FullHttpResponseWrapper responseWrapper = new FullHttpResponseWrapper(ctx, resp);   
         ((FullHttpRequestWrapper) requestWrapper).setResponse(responseWrapper);
         
         if(request.headers() != null)
@@ -94,15 +80,16 @@ public class HttpActionAdapter4Spring implements HttpActionAdapter
         	String contentTye = request.headers().get("Content-Type");
         	if(contentTye !=  null && contentTye.toUpperCase().contains("MULTIPART/FORM-DATA"))
         	{
-        		requestWrapper = new CommonsMultipartResolver().resolveMultipart(requestWrapper);
+        	    CommonsMultipartResolver cmr = new CommonsMultipartResolver();
+        	    cmr.setDefaultEncoding("UTF-8");
+        		requestWrapper = cmr.resolveMultipart(requestWrapper);
         	}
         }
         
         try
         {
             MicrowebFilterChain filterChain = new FilterChainFactory(servletContext).createFilterChain(requestWrapper,
-                dispatcherServlet,
-                DispatcherType.REQUEST);
+                dispatcherServlet,  DispatcherType.REQUEST);
             
             if (filterChain != null)
             {
@@ -117,8 +104,19 @@ public class HttpActionAdapter4Spring implements HttpActionAdapter
         {
             logger.error(e.getMessage(), e);
         }
-        
+    
         return responseWrapper.getResponse();
+    }
+    
+    private void appendContentType4Resource(FullHttpResponseWrapper responseWrapper, String requestURI)
+    {
+        int dotIdx = requestURI.lastIndexOf(".");
+        String extension = requestURI.substring(dotIdx+1);
+        if(MimeType.contains(extension))
+        {
+            String contentType = MimeType.get(extension);
+            responseWrapper.addHeader("Content-Type", contentType);
+        }
     }
     
     @Override

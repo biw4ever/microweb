@@ -287,6 +287,12 @@ public class HttpCoreServer
             return new HashMap<String, String[]>();
         }
         
+        String contentTye = request.headers().get("Content-Type");
+        if(contentTye !=  null && contentTye.toUpperCase().contains("MULTIPART/FORM-DATA"))
+        {
+            return new HashMap<String, String[]>();
+        }
+        
         byte[] dst = null;
         if (request.content().isDirect())
         {
@@ -298,16 +304,9 @@ public class HttpCoreServer
             dst = request.content().array();
         }
         
-        String bodyContent;
-        try
-        {
-            bodyContent = URLDecoder.decode(new String(dst, "UTF-8"));
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            logger.error("request content-type charset should be UTF-8");
-            throw new MicrowebException(e);
-        }
+        String bodyContent = new String(dst);
+        bodyContent = URLDecoder.decode(bodyContent);
+        
         return getParameters(bodyContent);
         
     }

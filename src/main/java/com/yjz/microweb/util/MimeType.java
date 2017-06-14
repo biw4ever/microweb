@@ -153,8 +153,9 @@ public class MimeType
         contentTypes.put("Z", "application/x-compress");
         contentTypes.put("z", "application/x-compress");
         contentTypes.put("zip", "application/zip");
-        contentTypes.put("do", "application/json");
-        contentTypes.put("act", "application/json");
+        contentTypes.put("ttf", "application/x-font-ttf");
+        contentTypes.put("woff", "application/x-font-woff");
+        contentTypes.put("do", "application/json");//RequestMapping返回json数据时使用，springmvc会据此往header中增加content-type : application/json
     }
 
     /**
